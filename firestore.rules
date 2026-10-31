@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'ttechnical820@gmail.com' ||
+        request.auth.token.email == 'admin@ahsec.edu'
+      );
+    }
+
+    function isValidQuestion(data) {
+      return data.subject in ['PHYSICS', 'CHEMISTRY'] &&
+             data.chapterId is int &&
+             data.questionText is string && data.questionText.size() <= 2000 &&
+             data.optionA is string && data.optionA.size() <= 500 &&
+             data.optionB is string && data.optionB.size() <= 500 &&
+             data.optionC is string && data.optionC.size() <= 500 &&
+             data.optionD is string && data.optionD.size() <= 500 &&
+             data.correctOption in ['A', 'B', 'C', 'D'];
+    }
+
+    // Questions Collection: Readable by all students, writeable by admin
+    match /questions/{questionId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidQuestion(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // User Profile
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && request.resource.data.role == resource.data.role;
+      allow delete: if isOwner(userId) || isAdmin();
+
+      // Exam Attempts Subcollection
+      match /attempts/{attemptId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

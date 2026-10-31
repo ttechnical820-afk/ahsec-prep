@@ -1,0 +1,6 @@
+{
+  "name": "AHSEC Prep 12",
+  "description": "AHSEC Class 12 Physics & Chemistry Part I MCQ Practice & Exam Prep Platform",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

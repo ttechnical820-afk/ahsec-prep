@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "Question": {
+      "title": "Question",
+      "description": "AHSEC syllabus multiple choice question",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "subject": { "type": "string", "enum": ["PHYSICS", "CHEMISTRY"] },
+        "chapterId": { "type": "integer" },
+        "chapterTitle": { "type": "string" },
+        "questionText": { "type": "string" },
+        "optionA": { "type": "string" },
+        "optionB": { "type": "string" },
+        "optionC": { "type": "string" },
+        "optionD": { "type": "string" },
+        "correctOption": { "type": "string", "enum": ["A", "B", "C", "D"] },
+        "explanation": { "type": "string" },
+        "whyIncorrect": { "type": "string" },
+        "isPyq": { "type": "boolean" },
+        "pyqYear": { "type": "string" },
+        "difficulty": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["subject", "chapterId", "questionText", "optionA", "optionB", "optionC", "optionD", "correctOption"]
+    },
+    "StudentProfile": {
+      "title": "StudentProfile",
+      "description": "Student profile registration data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string", "enum": ["STUDENT", "ADMIN"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "fullName", "email"]
+    },
+    "ExamAttempt": {
+      "title": "ExamAttempt",
+      "description": "Exam session performance report",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "chapterId": { "type": "integer" },
+        "totalQuestions": { "type": "integer" },
+        "correctCount": { "type": "integer" },
+        "incorrectCount": { "type": "integer" },
+        "unattemptedCount": { "type": "integer" },
+        "score": { "type": "integer" },
+        "percentage": { "type": "number" },
+        "durationSeconds": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "totalQuestions", "score"]
+    }
+  },
+  "firestore": {
+    "/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Public published question bank"
+    },
+    "/users/{userId}": {
+      "schema": "StudentProfile",
+      "description": "User student profiles"
+    },
+    "/users/{userId}/attempts/{attemptId}": {
+      "schema": "ExamAttempt",
+      "description": "User exam performance history"
+    }
+  }
+}
